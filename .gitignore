@@ -15,7 +15,7 @@
 # Datasets
 SMSSpamCollection
 Data/MNIST
-FFN/data
+data
 
 # AWS User-specific
 .idea/**/aws.xml
