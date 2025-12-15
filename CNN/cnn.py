@@ -1,149 +1,137 @@
-# From now onwards, I will be only working with torch. The scratch implementations are done :)
+# Here I will be implementing CNN from scratch.
 
-# Only one concept that is at the core is:
-# The calculation of what is sent to the next layer.
+# This will obviously be sphagetti code.
 
-# The usage of pooling layer just after cnn. Pooling is much faster than batch normalization.
-# Pooling reduces the computational cost by shrinking spatial dimensions, making subsequent
-# layers faster. BatchNorm adds overhead but stabilizes training and can lead to faster 
-# convergence overall.
+# The MNIST Data loading was taken from: https://numpy.org/numpy-tutorials/tutorial-deep-learning-on-mnist/
 
-# Pooling is a downsamples the spatial dimensions.
+import os
+import gzip
+import requests
+import numpy as np
+import scipy
+import matplotlib.pyplot as plt
 
-# Because it is not strict to just use the pooling layer after cnn, because the usage of pooling
-# layer, we lose the spatial information or the spatial depth. Like for semantic segmentation, or 
-# complex Computer Vision tasks, it is highly important to preserve the spatial information.
+np.random.seed(42)
 
-# But general classification task it is fine we use pooling, but it is important to always consider 
-# what data are we dealing with. Here I am using MNIST which is just a black and white images.
+data_dir = "../Data/MNIST"
+os.makedirs(data_dir, exist_ok=True)
 
-# Batch normalization normalizes feature distribution using the mean and variance. BN is not just
-# used after conv but can also be used after linear, because it is just a normalization technique.
+base_url = "https://ossci-datasets.s3.amazonaws.com/mnist/"
 
-# For example:
-# INPUT: (batch=1, channels=32, height=28, width=28)
+data_sources = {
+    "training_images": "train-images-idx3-ubyte.gz",  # 60,000 training images.
+    "test_images": "t10k-images-idx3-ubyte.gz",  # 10,000 test images.
+    "training_labels": "train-labels-idx1-ubyte.gz",  # 60,000 training labels.
+    "test_labels": "t10k-labels-idx1-ubyte.gz",  # 10,000 test labels.
+}
 
-# Pooling: 
-# pool = nn.MaxPool2d(2,2)
-# output = pool(input)
-# Output: (1, 32, 14, 14) -> Half the spatial size
+for fname in data_sources.values():
+    fpath = os.path.join(data_dir, fname)
+    if not os.path.exists(fpath):
+        print("Downloading file: " + fname)
+        resp = requests.get(base_url + fname, stream=True)
+        resp.raise_for_status()  # Ensure download was succesful
+        with open(fpath, "wb") as fh:
+            for chunk in resp.iter_content(chunk_size=128):
+                fh.write(chunk)
 
-# How did we calculate this?
-# here padding = 0, stride = 2, kernel = 2
-# h_width = ((height + 2 * padding - kernel) // stride) + 1 = ((28 + 0 - 2) // 2) + 1 = 14
-# w_width = ((width + 2 * padding - kernel) // stride) + 1 = ((28 + 0 - 2) // 2) + 1 = 14
+mnist_dataset = {}
 
-# Batch Normalization
-# bn = nn.BatchNorm2d(32)
-# output = bn(input)
-# Output: (1, 32, 28, 28) -> Same shape
-
-# We lose pixel location when we do pooling, while the BN preserves it.
-
-# Standard pattern that we observe is : Conv -> BatchNorm -> ReLU -> MaxPool (repeat 2 - 3 times) -> Flatten
-
-
-import torch
-from torch import nn
-import torchvision as tv
-
-device = "mps" if torch.mps.is_available() else "cpu"
-
-training_data = tv.datasets.MNIST(
-    root="data",
-    train=True,
-    transform=tv.transforms.ToTensor(),
-    download=True,
-)
-
-testing_data = tv.datasets.MNIST(
-    root="data",
-    train=False,
-    transform=tv.transforms.ToTensor(),
-    download=True,
-)
-
-
-train_data = torch.utils.data.DataLoader(training_data, batch_size=32, shuffle=True)
-test_data = torch.utils.data.DataLoader(testing_data, batch_size=32, shuffle=True)
-
-print(len(training_data.data), len(train_data))
-print(len(testing_data.data), len(test_data), "\n")
-
-
-class cnn(nn.Module):
-    
-    def __init__(self):
-        super().__init__()
+# Images
+for key in ("training_images", "test_images"):
+    with gzip.open(os.path.join(data_dir, data_sources[key]), "rb") as mnist_file:
+        mnist_dataset[key] = np.frombuffer(
+            mnist_file.read(), np.uint8, offset=16
+        ).reshape(-1, 28 * 28)
+# Labels
+for key in ("training_labels", "test_labels"):
+    with gzip.open(os.path.join(data_dir, data_sources[key]), "rb") as mnist_file:
+        mnist_dataset[key] = np.frombuffer(mnist_file.read(), np.uint8, offset=8)
         
-        self.c1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, stride=2, padding=1)
-        self.b1 = nn.BatchNorm2d(32)
-        self.ch1 = nn.ReLU()
-        self.flat = nn.Flatten()
-        self.z1 = nn.LazyLinear(128)
-        self.h1 = nn.ReLU()
-        self.z2 = nn.Linear(128, 10)
+x_train, y_train, x_test, y_test = (
+    mnist_dataset["training_images"],
+    mnist_dataset["training_labels"],
+    mnist_dataset["test_images"],
+    mnist_dataset["test_labels"],
+)
+
+# Normalize pixel values to [0, 1] range
+x_train = x_train.astype(np.float32) / 255.0
+x_test = x_test.astype(np.float32) / 255.0
+
+print(
+    "The shape of training images: {} and training labels: {}".format(
+        x_train.shape, y_train.shape
+    )
+)
+print(
+    "The shape of test images: {} and test labels: {}".format(
+        x_test.shape, y_test.shape
+    ), "\n"
+)
+
+def print_mnist(X, y):
+    C, H, W = X.shape
+    k = 0  # show first channel
+    for i in range(H):
+        for j in range(W):
+            print(f"{X[k,i,j]:.4f}", end="\t")
+        print()
+    print(f"\n{y}")
+
+# Let's start implementing Convolution Layer from scratch.
+
+class CNN2D:
+    
+    def __init__(self, in_channels=1, out_channels=32, kernel=2):
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.kernel = kernel
+        
+        self.weights = np.random.randn(self.out_channels, self.in_channels, self.kernel, self.kernel)
+        self.bias = np.random.randn(self.out_channels)
+        
         
     def forward(self, X):
-        X = self.c1(X)
-        X = self.b1(X)
-        X = self.ch1(X)
-        X = self.flat(X)
-        X = self.z1(X)
-        X = self.h1(X)
-        X = self.z2(X)
+        self.input_data = X.copy()
         
-        return X
+        print(self.weights.shape, self.bias.shape, self.input_data.shape)
+        
+        out = []
+        
+        for i in range(self.out_channels):
+            for j in range(self.in_channels):
+                out.append(scipy.signal.correlate2d(self.input_data[j], self.weights[i,j], 'valid'))
+        
+        out = np.array(out)
+        print(self.bias[:, None, None].shape, out.shape)
+        out += self.bias[:, None, None]
+        
+        return out
+        
     
-
-model = cnn()
-print(model, "\n")
-model.to(device)
-
-model.train()
-optimizer = torch.optim.SGD(model.parameters())
-loss = torch.nn.CrossEntropyLoss()
-
-epochs = 10
-for epoch in range(epochs):
-    epoch_loss = 0
-    correct = 0
-    for batch_idx, (data, target) in enumerate(train_data):
-        data = data.to(device)
-        target = target.to(device)
+    def backward(self, out_gradient, lr=0.001):
+        kernel_gradient = np.zeros_like(self.weights)
+        input_gradient = np.zeros_like(self.input_data)
         
-        optimizer.zero_grad()
-        y_pred = model.forward(data)
-        batch_loss = loss(y_pred, target)
-        epoch_loss+=batch_loss
-        batch_loss.backward()
-        optimizer.step()
+        for i in range(self.out_channels):
+            for j in range(self.in_channels):
+                kernel_gradient[i,j] = scipy.signal.correlate2d(self.input_data[j], out_gradient[i], "valid")
+                input_gradient[j] += scipy.signal.convolve2d(out_gradient[i], self.weights[i,j], 'full')
+                
+        self.weights -= lr * kernel_gradient
+        self.bias -= lr * np.sum(out_gradient, axis=(1,2))
         
-        y_pred_correct = torch.argmax(y_pred, dim=1)
-        correct += torch.sum(y_pred_correct == target)
-
-    correct = correct / len(training_data.data)
-    avg_loss = epoch_loss / len(train_data)
-    print(f"Epoch: {epoch+1}, AvgLoss: {avg_loss:.4f}, Total Loss: {epoch_loss:.4f}, Accuracy: {correct:.4f}")
-
-print()
-
-model.eval()
-with torch.no_grad():
-    epoch_loss = 0
-    correct = 0
-    for batch_idx, (data, target) in enumerate(test_data):
-        data = data.to(device)
-        target = target.to(device)
-        
-        y_pred = model.forward(data)
-        batch_loss = loss(y_pred, target)
-        epoch_loss+=batch_loss
-        
-        y_pred_correct = torch.argmax(y_pred, dim=1)
-        correct += torch.sum(y_pred_correct == target)
+        return input_gradient
     
-    correct = correct / len(testing_data.data)
-    avg_loss = epoch_loss / len(test_data)
+# The output size is formulated like this:
+# output_size = ((input + 2 * padding - kernel) / stride) + 1
+        
+conv_1 = CNN2D()
+        
+for data, target in zip(x_train, y_train):
+    data = np.reshape(data, (1,28,28))
+    conv_1.forward(data)
     
-    print(f"AvgLoss: {avg_loss:.4f}, Total Loss: {epoch_loss:.4f}, Accuracy: {correct:.4f}")
+    break
+    
