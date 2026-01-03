@@ -9,3 +9,5 @@ Completed Learning:
   - ✅ Torch
 
 - Plots generated using AI
+
+Optimization techniques - [Blog](https://www.ruder.io/optimizing-gradient-descent/)
