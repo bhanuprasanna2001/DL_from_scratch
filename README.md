@@ -7,6 +7,11 @@ Completed Learning:
 - ✅ FFN
   - ✅ Numpy
   - ✅ Torch
+- ✅ CNN
+  - ✅ Numpy
+  - ✅ Torch
+- ✅ RNN
+  - ✅ Numpy
 
 - Plots generated using AI
 
