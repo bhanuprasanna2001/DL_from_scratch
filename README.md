@@ -12,6 +12,8 @@ Completed Learning:
   - ✅ Torch
 - ✅ RNN
   - ✅ Numpy
+- ✅ LSTM
+  - ✅ Numpy
 
 - Plots generated using AI
 
