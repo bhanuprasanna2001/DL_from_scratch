@@ -14,6 +14,8 @@ Completed Learning:
   - ✅ Numpy
 - ✅ LSTM
   - ✅ Numpy
+  - ✅ Baby Name Generation
+  - ✅ Seq2Seq - English to French Translation
 
 - Plots generated using AI
 
