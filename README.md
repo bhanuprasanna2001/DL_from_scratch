@@ -16,6 +16,10 @@ Completed Learning:
   - ✅ Numpy
   - ✅ Baby Name Generation
   - ✅ Seq2Seq - English to French Translation
+- ✅ Autoencoder
+  - ✅ CNN Autoencoder Torch MNIST
+  - ✅ LSTM Autoencoder with ECG data
+  - ✅ Noise Cleaning Autoencoder Fashion MNIST
 
 - Plots generated using AI
 

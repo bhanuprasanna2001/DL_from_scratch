@@ -1,5 +1,49 @@
 # Here I will be implementing CNN from scratch.
 
+# From now onwards, I will be only working with torch. The scratch implementations are done :)
+
+# Only one concept that is at the core is:
+# The calculation of what is sent to the next layer.
+
+# The usage of pooling layer just after cnn. Pooling is much faster than batch normalization.
+# Pooling reduces the computational cost by shrinking spatial dimensions, making subsequent
+# layers faster. BatchNorm adds overhead but stabilizes training and can lead to faster 
+# convergence overall.
+
+# Pooling is a downsamples the spatial dimensions.
+
+# Because it is not strict to just use the pooling layer after cnn, because the usage of pooling
+# layer, we lose the spatial information or the spatial depth. Like for semantic segmentation, or 
+# complex Computer Vision tasks, it is highly important to preserve the spatial information.
+
+# But general classification task it is fine we use pooling, but it is important to always consider 
+# what data are we dealing with. Here I am using MNIST which is just a black and white images.
+
+# Batch normalization normalizes feature distribution using the mean and variance. BN is not just
+# used after conv but can also be used after linear, because it is just a normalization technique.
+
+# For example:
+# INPUT: (batch=1, channels=32, height=28, width=28)
+
+# Pooling: 
+# pool = nn.MaxPool2d(2,2)
+# output = pool(input)
+# Output: (1, 32, 14, 14) -> Half the spatial size
+
+# How did we calculate this?
+# here padding = 0, stride = 2, kernel = 2
+# h_width = ((height + 2 * padding - kernel) // stride) + 1 = ((28 + 0 - 2) // 2) + 1 = 14
+# w_width = ((width + 2 * padding - kernel) // stride) + 1 = ((28 + 0 - 2) // 2) + 1 = 14
+
+# Batch Normalization
+# bn = nn.BatchNorm2d(32)
+# output = bn(input)
+# Output: (1, 32, 28, 28) -> Same shape
+
+# We lose pixel location when we do pooling, while the BN preserves it.
+
+# Standard pattern that we observe is : Conv -> BatchNorm -> ReLU -> MaxPool (repeat 2 - 3 times) -> Flatten
+
 # This will obviously be sphagetti code.
 
 # The MNIST Data loading was taken from: https://numpy.org/numpy-tutorials/tutorial-deep-learning-on-mnist/
