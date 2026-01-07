@@ -16,6 +16,7 @@
 SMSSpamCollection
 Data/MNIST
 data
+COCO
 
 # AWS User-specific
 .idea/**/aws.xml

@@ -36,7 +36,7 @@ class DenoisingAE(nn.Module):
         return decoded
 
 # 3. TRAIN WITH NOISE
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("mps" if torch.mps.is_available() else "cpu")
 model = DenoisingAE().to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
