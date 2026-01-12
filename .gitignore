@@ -17,6 +17,9 @@ SMSSpamCollection
 Data/MNIST
 data
 COCO
+zfdocs
+zero_shot
+few_shot
 
 # AWS User-specific
 .idea/**/aws.xml
