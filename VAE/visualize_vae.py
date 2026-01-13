@@ -276,7 +276,7 @@ if __name__ == "__main__":
     models = {}
     
     for beta in [0, 1, 4]:
-        model = VAE(latent_dim=20, beta=beta)
+        model = VAE(latent_dim=4, beta=beta)
         model_path = output_dir / f"vae_beta_{beta}.pth"
         
         if model_path.exists():

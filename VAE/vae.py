@@ -198,7 +198,7 @@ def train_vae(model, train_loader, test_loader, epochs=30, lr=1e-3, device='cpu'
 
 def main():
     """Main training pipeline"""
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('mps' if torch.mps.is_available() else 'cpu')
     print(f"Device: {device}\n")
     
     # Load data
