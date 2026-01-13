@@ -11,8 +11,8 @@ For in blog format refer to: [BLOG DL](https://bhanuprasanna2001.github.io/learn
 ## Implemented Architectures
 
 ### Feed-Forward Networks (FFN)
-- **NumPy Implementation**: Custom gradient computation with backpropagation
-- **PyTorch Implementation**: Modern framework-based approach
+- **NumPy Implementation**: Gradient computation with backpropagation
+- **PyTorch Implementation**
 - **Dataset**: MNIST digit classification
 - **Features**: Cross-entropy loss, ReLU activation, softmax output, ROC curves, multi-class metrics
 
@@ -78,30 +78,9 @@ Three distinct implementations exploring dimensionality reduction:
 ## Key Features
 
 - **From-Scratch Implementations**: Core algorithms implemented in NumPy to understand backpropagation mechanics
-- **Modern Framework Versions**: Efficient PyTorch implementations for comparison and practical use
 - **Mathematical Rigor**: Detailed comments explaining gradient computations and architectural choices
 - **Comprehensive Evaluation**: Multiple metrics, visualization tools, and performance analysis
 - **Progressive Complexity**: Structured learning path from basic FFN to advanced VAE architectures
-
-## Technical Highlights
-
-### NumPy Implementations
-- Manual gradient computation for all layers
-- Custom loss functions and activation derivatives
-- Memory-efficient batch processing
-- Educational focus with extensive documentation
-
-### PyTorch Implementations
-- Modern best practices (batch normalization, dropout, learning rate scheduling)
-- Data augmentation pipelines
-- Mixed-precision training support
-- Gradient clipping and regularization techniques
-
-### Advanced Techniques
-- **Sampling Methods**: Temperature scaling, top-k, top-p (nucleus sampling)
-- **Attention Mechanisms**: Bahdanau attention for Seq2Seq
-- **Regularization**: β-VAE for latent space disentanglement
-- **Optimization**: Adam, SGD with momentum, learning rate decay
 
 ## Requirements
 
