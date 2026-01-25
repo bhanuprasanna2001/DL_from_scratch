@@ -1,10 +1,10 @@
 # Deep Learning from Scratch
 
-A comprehensive implementation of fundamental deep learning architectures using NumPy and PyTorch, focusing on mathematical foundations and practical applications.
+This repository contains implementations of deep learning architectures using NumPy and PyTorch.
 
 ## Overview
 
-This repository contains from-scratch implementations of core deep learning models, progressing from simple feed-forward networks to advanced architectures like variational autoencoders and sequence-to-sequence models. Each implementation emphasizes understanding the underlying mathematics and gradient computations.
+This repository contains from-scratch implementations of core deep learning models, progressing from simple feed-forward networks to advanced architectures, such as variational autoencoders and sequence-to-sequence models. Each implementation emphasizes understanding the underlying mathematics and gradient computations.
 
 For in blog format refer to: [BLOG DL](https://bhanuprasanna2001.github.io/learning/ai/DL/)
 
