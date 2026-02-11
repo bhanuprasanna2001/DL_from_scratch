@@ -71,8 +71,11 @@ Three distinct implementations exploring dimensionality reduction:
 │   ├── lstm_autoencoder.py
 │   └── noise_autoencoder.py
 └── VAE/                    # Variational autoencoders
-    ├── vae.py
-    └── visualize_vae.py
+│   ├── vae.py
+│   └── visualize_vae.py
+└── Transformers/           # Transformers
+    ├── transformer.py
+    └── models
 ```
 
 ## Key Features
